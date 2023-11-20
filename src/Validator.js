@@ -114,6 +114,8 @@ class ObjectValidator extends BaseValidator {
     }
 
     _baseValidation(value) {
+        if (typeof value !== "object" || value === null) return false;
+
         return Object.entries(value).every(([key, value]) => this.shapeStructure[key].isValid(value));
     }
     shape(objectData) {
@@ -121,6 +123,8 @@ class ObjectValidator extends BaseValidator {
     }
 
     isValid(value) {
+        if (this.isEmptyValue(value)) return true;
+
         return this._baseValidation(value);
     }
 }

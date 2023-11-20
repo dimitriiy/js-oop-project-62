@@ -113,6 +113,18 @@ describe("Test Validator", () => {
     });
 
     describe("Test shape", () => {
+        it("base 0", () => {
+            const v = new Validator();
+
+            const schema = v.object();
+
+            schema.shape({
+                name: v.string(),
+                age: v.number().positive(),
+            });
+
+            expect(schema.isValid(null)).toBeTruthy(); // true
+        });
         it("base 1", () => {
             const v = new Validator();
 
