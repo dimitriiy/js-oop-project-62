@@ -1,7 +1,14 @@
 class BaseValidator {
-    constructor(isRequired) {
+    constructor(isRequired, customValidators) {
         this.isRequired = isRequired;
         this.validators = [];
+        this.customValidators = customValidators ?? {};
+    }
+
+    test(name, data) {
+        this.validators.push((value) => this.customValidators[name](value, data));
+
+        return this;
     }
 
     _baseValidation(value) {
@@ -14,20 +21,16 @@ class BaseValidator {
         return false;
     }
 
-    addValidators(fn) {
+    _addValidators(fn) {
         this.validators.push(fn);
     }
+
     required() {
         this.isRequired = true;
         return this;
     }
 }
 class StringValidator extends BaseValidator {
-    constructor(isRequired) {
-        super(isRequired);
-
-        this.validators = [];
-    }
     isValid(value) {
         if (this.isEmptyValue(value)) return true;
 
@@ -43,7 +46,7 @@ class StringValidator extends BaseValidator {
         };
     }
     contains(value) {
-        this.addValidators(this._contains(value));
+        this._addValidators(this._contains(value));
         return this;
     }
 }
@@ -57,13 +60,15 @@ class NumberValidator extends BaseValidator {
     }
 
     positive() {
-        this.addValidators(this._isPositive);
+        this._addValidators(this._isPositive);
 
         return this;
     }
 
     range(start, end) {
-        this.addValidators(this._isInRange(start, end));
+        this._addValidators(this._isInRange(start, end));
+
+        return this;
     }
 
     isValid(value) {
@@ -79,7 +84,7 @@ class NumberValidator extends BaseValidator {
 class ArrayValidator extends BaseValidator {
     constructor(isRequired) {
         super(isRequired);
-        this.addValidators(this._baseValidation);
+        this._addValidators(this._baseValidation);
     }
 
     _baseValidation(value) {
@@ -96,21 +101,57 @@ class ArrayValidator extends BaseValidator {
     }
 
     sizeof(length) {
-        this.addValidators(this._checkSize(length));
+        this._addValidators(this._checkSize(length));
         return this;
     }
 }
 
+class ObjectValidator extends BaseValidator {
+    constructor(isRequired) {
+        super(isRequired);
+        this.shapeStructure = null;
+        this._addValidators(this._baseValidation);
+    }
+
+    _baseValidation(value) {
+        return Object.entries(value).every(([key, value]) => this.shapeStructure[key].isValid(value));
+    }
+    shape(objectData) {
+        this.shapeStructure = objectData;
+    }
+
+    isValid(value) {
+        return this._baseValidation(value);
+    }
+}
+
 export class Validator extends BaseValidator {
+    constructor(props) {
+        super(props);
+
+        this.customValidators = {};
+    }
+
+    addValidator(type, name, fn) {
+        this.customValidators = {
+            [type]: {
+                [name]: fn,
+            },
+        };
+
+        return this;
+    }
     string() {
-        return new StringValidator(this.isRequired);
+        return new StringValidator(this.isRequired, this.customValidators["string"]);
     }
     number() {
-        return new NumberValidator(this.isRequired);
+        return new NumberValidator(this.isRequired, this.customValidators["number"]);
     }
 
     array() {
         return new ArrayValidator(this.isRequired);
     }
-    shape() {}
+    object() {
+        return new ObjectValidator(this.isRequired);
+    }
 }
