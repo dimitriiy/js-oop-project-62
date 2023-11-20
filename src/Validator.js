@@ -1,9 +1,11 @@
-import { v } from "npm-check-updates/build/src/lib/version-util.js";
-
 class BaseValidator {
     constructor(isRequired) {
         this.isRequired = isRequired;
         this.validators = [];
+    }
+
+    _baseValidation(value) {
+        throw new Error("BaseValidation not implemented!");
     }
 
     isEmptyValue(value) {
@@ -74,6 +76,30 @@ class NumberValidator extends BaseValidator {
         return typeof value === "number";
     }
 }
+class ArrayValidator extends BaseValidator {
+    constructor(isRequired) {
+        super(isRequired);
+        this.addValidators(this._baseValidation);
+    }
+
+    _baseValidation(value) {
+        return Array.isArray(value);
+    }
+
+    _checkSize(length) {
+        return (value) => value.length >= length;
+    }
+    isValid(value) {
+        if (this.isEmptyValue(value)) return true;
+
+        return this.validators.every((fn) => fn(value));
+    }
+
+    sizeof(length) {
+        this.addValidators(this._checkSize(length));
+        return this;
+    }
+}
 
 export class Validator extends BaseValidator {
     string() {
@@ -83,5 +109,8 @@ export class Validator extends BaseValidator {
         return new NumberValidator(this.isRequired);
     }
 
+    array() {
+        return new ArrayValidator(this.isRequired);
+    }
     shape() {}
 }

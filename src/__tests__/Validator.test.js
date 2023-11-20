@@ -82,4 +82,33 @@ describe("Test Validator", () => {
             expect(schema.isValid(-1)).toBeFalsy();
         });
     });
+
+    describe("Test array", () => {
+        it("Test empty", () => {
+            const v = new Validator();
+            const schema = v.array();
+
+            expect(schema.isValid(null)).toBeTruthy(); // true
+        });
+        it("Test required", () => {
+            const v = new Validator();
+            const schema = v.array();
+
+            schema.required();
+
+            expect(schema.isValid(null)).toBeFalsy(); // false
+            expect(schema.isValid([])).toBeTruthy(); // true
+            expect(schema.isValid(["hexlet"])).toBeTruthy(); // true
+        });
+
+        it("Test sizeof", () => {
+            const v = new Validator();
+            const schema = v.array();
+
+            schema.sizeof(2);
+
+            expect(schema.isValid(["hexlet"])).toBeFalsy(); // false
+            expect(schema.isValid(["hexlet", "code-basics"])).toBeTruthy(); // true
+        });
+    });
 });
