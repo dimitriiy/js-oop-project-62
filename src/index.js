@@ -1,1 +1,3 @@
-export { Validator } from "./Validator.js";
+import Validator from './Validator.js';
+
+export default Validator;

@@ -1,0 +1,30 @@
+class BaseValidator {
+  constructor(isRequired, customValidators) {
+    this.isRequired = isRequired;
+    this.validators = [];
+    this.customValidators = customValidators ?? {};
+  }
+
+  test(name, data) {
+    this.validators.push((value) => this.customValidators[name](value, data));
+
+    return this;
+  }
+
+  isEmptyValue(value) {
+    if (!this.isRequired && (value == null || value === '')) return true;
+
+    return false;
+  }
+
+  addValidators(fn) {
+    this.validators.push(fn);
+  }
+
+  required() {
+    this.isRequired = true;
+    return this;
+  }
+}
+
+export default BaseValidator;
