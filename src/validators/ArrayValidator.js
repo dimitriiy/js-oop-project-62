@@ -2,8 +2,8 @@ import BaseValidator from './BaseValidator.js';
 
 const checkSize = (length) => (value) => value.length >= length;
 class ArrayValidator extends BaseValidator {
-  constructor(isRequired) {
-    super(isRequired);
+  constructor(options) {
+    super(options);
     this.addValidators(ArrayValidator.baseValidation);
   }
 

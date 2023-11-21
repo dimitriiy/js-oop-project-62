@@ -3,6 +3,16 @@ import BaseValidator from './BaseValidator.js';
 const isInRange = (start, end) => (value) => start <= value && value <= end;
 const isPositive = (value) => value > 0;
 class NumberValidator extends BaseValidator {
+  constructor(options) {
+    super(options);
+
+    this.addValidators(NumberValidator.baseValidation);
+  }
+
+  static baseValidation(value) {
+    return typeof value === 'number';
+  }
+
   positive() {
     this.addValidators(isPositive);
 
@@ -18,11 +28,7 @@ class NumberValidator extends BaseValidator {
   isValid(value) {
     if (this.isEmptyValue(value)) return true;
 
-    if (this.validators.length) {
-      return this.validators.every((fn) => fn(value));
-    }
-
-    return typeof value === 'number';
+    return this.validators.every((fn) => fn(value));
   }
 }
 

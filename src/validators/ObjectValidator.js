@@ -1,8 +1,8 @@
 import BaseValidator from './BaseValidator.js';
 
 class ObjectValidator extends BaseValidator {
-  constructor(isRequired) {
-    super(isRequired);
+  constructor(options) {
+    super(options);
     this.shapeStructure = null;
     this.addValidators(this.baseValidation);
   }

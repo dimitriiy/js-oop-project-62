@@ -1,14 +1,8 @@
 class BaseValidator {
-  constructor(isRequired, customValidators) {
+  constructor({ isRequired, customValidators } = { isRequired: false, customValidators: {} }) {
     this.isRequired = isRequired;
     this.validators = [];
     this.customValidators = customValidators ?? {};
-  }
-
-  test(name, data) {
-    this.validators.push((value) => this.customValidators[name](value, data));
-
-    return this;
   }
 
   isEmptyValue(value) {
