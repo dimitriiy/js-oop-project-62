@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 
-import Validator from '../Validator.js';
+import { Validator } from '../Validator';
 
 describe('Test Validator', () => {
   describe('Test string validation', () => {
